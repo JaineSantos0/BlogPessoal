@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -97,4 +98,20 @@ public class UsuarioService {
 
     }
 
+    public List<Usuario> pegarTodosUsuarios() {
+        return usuarioRepository.findAll();
+    }
+
+    public Optional<Usuario> pegarUsuarioId(Long id) {
+        Optional<Usuario> usuarioById = usuarioRepository.findById(id);
+        return usuarioById;
+    }
+
+    public void deletarUsuario(Long id) {
+        if (pegarUsuarioId(id).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        usuarioRepository.deleteById(id);
+    }
 }

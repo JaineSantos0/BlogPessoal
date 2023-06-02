@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import com.generation.blogpessoal.model.Usuario;
 import com.generation.blogpessoal.model.UsuarioLogin;
-import com.generation.blogpessoal.repository.UsuarioRepository;
 import com.generation.blogpessoal.service.UsuarioService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +23,18 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
     @GetMapping("/all")
-    public ResponseEntity <List<Usuario>> getAll(){
-        return ResponseEntity.ok(usuarioRepository.findAll());
+    public ResponseEntity<List<Usuario>> getAll(){
+        List<Usuario> usuarios = usuarioService.pegarTodosUsuarios();
+       return ResponseEntity.ok(usuarios);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> getById(@PathVariable Long id) {
-        return usuarioRepository.findById(id)
+        ResponseEntity<Usuario> usuarioResponseEntity = usuarioService.pegarUsuarioId(id)
                 .map(resposta -> ResponseEntity.ok(resposta))
                 .orElse(ResponseEntity.notFound().build());
+        return usuarioResponseEntity;
     }
 
     @PostMapping("/logar")
@@ -62,15 +60,10 @@ public class UsuarioController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void delete (@PathVariable Long id) {
-        Optional<Usuario> optionalUsuario = usuarioRepository.findById(id);
-        if (optionalUsuario.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        usuarioRepository.deleteById(id);
+    public ResponseEntity delete (@PathVariable Long id) {
+        usuarioService.deletarUsuario(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }
